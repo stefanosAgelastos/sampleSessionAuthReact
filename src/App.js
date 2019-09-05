@@ -1,82 +1,92 @@
-import React, { Component } from 'react';
-import axios from 'axios'
+import React, { Component } from "react";
+import axios from "axios";
+import { Route } from "react-router-dom";
+import SignUp from "./components/SignUp";
+import SignIn from "./components/SignIn";
+import AuthLayout from "./components/AuthLayout";
+import Dashboard from "./components/Dashboard";
 
-import { Route, Link } from 'react-router-dom'
-import Home from './components/Home'
-import Signup from './components/Signup'
-import LoginForm from './components/login-form'
-import Navbar from './components/navbar'
-
-import './App.css';
+import "./App.css";
 // import { runInContext } from 'vm';
 
 class App extends Component {
-    constructor() {
-        super()
-        this.state = {
+  constructor() {
+    super();
+    this.state = {
+      loggedIn: false,
+      username: null
+    };
+
+    this.getUser = this.getUser.bind(this);
+    this.componentDidMount = this.componentDidMount.bind(this);
+    this.updateUser = this.updateUser.bind(this);
+  }
+
+  componentDidMount() {
+    this.getUser();
+  }
+
+  updateUser(userObject) {
+    this.setState(userObject);
+  }
+
+  getUser() {
+    axios.get("/user/").then(response => {
+      console.log("Get user response: ");
+      console.log(response.data);
+      if (response.data.user) {
+        console.log("Get User: There is a user saved in the server session: ");
+
+        this.setState({
+          loggedIn: true,
+          username: response.data.user.username
+        });
+      } else {
+        console.log("Get user: no user");
+        this.setState({
           loggedIn: false,
           username: null
-        }
-    
-        this.getUser = this.getUser.bind(this)
-        this.componentDidMount = this.componentDidMount.bind(this)
-        this.updateUser = this.updateUser.bind(this)
+        });
       }
-    
-      componentDidMount() {
-        this.getUser()
-      }
-    
-      updateUser (userObject) {
-        this.setState(userObject)
-      }
-
-    getUser() {
-        axios.get('/user/').then(response => {
-          console.log('Get user response: ')
-          console.log(response.data)
-          if (response.data.user) {
-            console.log('Get User: There is a user saved in the server session: ')
-
-            this.setState({
-              loggedIn: true,
-              username: response.data.user.username
-            })
-          } else {
-            console.log('Get user: no user');
-            this.setState({
-              loggedIn: false,
-              username: null
-            })
-          }
-        })
-      }
-
+    });
+  }
 
   render() {
+    const loggedIn = this.state.loggedIn;
+
+    if (loggedIn) {
+      return (
+        <React.Fragment>
+          <Route
+            exact
+            path="/"
+            render={() => (
+              <Dashboard
+                updateUser={this.updateUser}
+                loggedIn={this.state.loggedIn}
+              />
+            )}
+          />
+          {/* Greet the user if he/she is logged-in (i.e. loggedIn is true) */}
+          {this.state.loggedIn && <p>Join the party, {this.state.username}</p>}
+        </React.Fragment>
+      );
+    }
     return (
       <div className="App">
-      <Navbar updateUser={this.updateUser} loggedIn={this.state.loggedIn} />
+        <AuthLayout>
+          <Route
+            exact
+            path="/"
+            render={() => <SignIn updateUser={this.updateUser} />}
+          />
+          <Route
+            path="/signin"
+            render={() => <SignIn updateUser={this.updateUser} />}
+          />
 
-      {/* Greet the user if he/she is logged-in (i.e. loggedIn is true) */}
-      {this.state.loggedIn && <p>Join the party, {this.state.username}</p>}
-        <Route
-        exact path="/"
-        component={Home} />
-
-        <Route
-        path="/login"
-        render={() =>
-            <LoginForm
-            updateUser={this.updateUser}
-            />}
-        />
-
-        <Route
-        path="/signup"
-        render={() =>
-            <Signup/>}
-        />
+          <Route path="/signup" render={() => <SignUp />} />
+        </AuthLayout>
       </div>
     );
   }

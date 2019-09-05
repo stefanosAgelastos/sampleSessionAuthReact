@@ -75,7 +75,7 @@ router.post('/logout', (req, res) => {
     if (req.user) {
         // console.log('Before logging out see the contents of req.body');
         // console.log(req.body);
-        // req.logout()
+        req.logout()
         res.send({ msg: 'loggging out' })
     } else {
         res.send({msg: 'no user to logout'})

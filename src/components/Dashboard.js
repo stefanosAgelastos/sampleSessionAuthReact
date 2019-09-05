@@ -5,7 +5,7 @@ import logo from '../logo.svg';
 import '../App.css';
 import axios from 'axios'
 
-class Navbar extends Component {
+class Dashboard extends Component {
     constructor(props) {
         super(props);
         this.logout = this.logout.bind(this)
@@ -70,7 +70,7 @@ class Navbar extends Component {
 }
 
 
-export default Navbar;
+export default Dashboard;
 
 /* 1> this.props.loggedIn - loggedIn is a state in App.js and I am passing it down in App.js to Navbar component with
 
