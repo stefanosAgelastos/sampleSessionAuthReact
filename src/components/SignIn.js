@@ -1,8 +1,8 @@
 // It contains a login form. On clicking submit, it makes an axios post request with the username and password:
 
-import React from 'react'
-import { Redirect } from 'react-router-dom'
-import axios from 'axios'
+import React from "react";
+import { Redirect } from "react-router-dom";
+import axios from "axios";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
@@ -23,53 +23,52 @@ const styles = theme => ({
 });
 
 class SignIn extends React.Component {
-    constructor() {
-        super()
-        this.state = {
-            username: '',
-            password: '',
-            redirectTo: null
+  constructor() {
+    super();
+    this.state = {
+      username: "",
+      password: "",
+      redirectTo: null
+    };
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  handleChange(event) {
+    this.setState({
+      [event.target.name]: event.target.value
+    });
+  }
+
+  handleSubmit(event) {
+    event.preventDefault();
+    // console.log('handleSubmit')
+
+    axios
+      .post("/user/login", {
+        username: this.state.username,
+        password: this.state.password
+      })
+      .then(response => {
+        console.log("login response: ");
+        console.log(response);
+        if (response.status === 200) {
+          // update App.js state
+          this.props.updateUser({
+            loggedIn: true,
+            username: response.data.username
+          });
+          // update the state to redirect to home
+          this.setState({
+            redirectTo: "/"
+          });
         }
-        this.handleSubmit = this.handleSubmit.bind(this)
-        this.handleChange = this.handleChange.bind(this)
-
-    }
-
-    handleChange(event) {
-        this.setState({
-            [event.target.name]: event.target.value
-        })
-    }
-
-    handleSubmit(event) {
-        event.preventDefault()
-        // console.log('handleSubmit')
-
-        axios
-            .post('/user/login', {
-                username: this.state.username,
-                password: this.state.password
-            })
-            .then(response => {
-                console.log('login response: ')
-                console.log(response)
-                if (response.status === 200) {
-                    // update App.js state
-                    this.props.updateUser({
-                        loggedIn: true,
-                        username: response.data.username
-                    })
-                    // update the state to redirect to home
-                    this.setState({
-                        redirectTo: '/'
-                    })
-                }
-            }).catch(error => {
-                console.log('login error: ')
-                console.log(error);
-
-            })
-    }
+      })
+      .catch(error => {
+        console.log("login error: ");
+        console.log(error);
+      });
+  }
 
   render() {
     return (
@@ -108,10 +107,7 @@ class SignIn extends React.Component {
             value={this.state.password}
             onChange={this.handleChange}
           />
-          <FormControlLabel
-            control={<Checkbox value="remember" color="primary" />}
-            label="Remember me"
-          />
+
           <Button
             type="submit"
             fullWidth
@@ -122,11 +118,7 @@ class SignIn extends React.Component {
             Sign In
           </Button>
           <Grid container>
-            <Grid item xs>
-              <Link href="#" variant="body2">
-                Forgot password?
-              </Link>
-            </Grid>
+            <Grid item xs></Grid>
             <Grid item>
               <Link href="/signup" variant="body2">
                 {"Don't have an account? Sign Up"}
@@ -140,7 +132,6 @@ class SignIn extends React.Component {
 }
 
 export default withStyles(styles)(SignIn);
-
 
 /* 1> From this LoginForm components is sent the request from user's browsers to the server for logging in with axios.post
 
